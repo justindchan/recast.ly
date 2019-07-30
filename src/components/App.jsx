@@ -5,38 +5,34 @@ import VideoListEntry from './VideoListEntry.js';
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.click = this.click.bind(this);
     this.state = {
       selected: exampleVideoData[0]
-    }
+    };
+    this.click = this.click.bind(this);
   }
-  click(event) {
-    console.log(event);
-    console.log('click!');
-    var url;
+  click(video) {
     this.setState({
-      selected: url;
-    })
+      selected: video
+    });
   }
   render() {
-
     return (
       <div>
-      <nav className="navbar">
-        <div className="col-md-6 offset-md-3">
-          <div><h5><em>search</em> view goes here</h5></div>
-        </div>
-      </nav>
-      <div className="row">
-        <div className="col-md-7">
-          <div><h5><em><VideoPlayer video={this.state.selected}/> </em> </h5></div>
-        </div>
-        <div className="col-md-5">
-          <div><h5><em> <VideoList videos={exampleVideoData} click={this.click}/> </em></h5></div>
+        <nav className="navbar">
+          <div className="col-md-6 offset-md-3">
+            <div>search</div>
+          </div>
+        </nav>
+        <div className="row">
+          <div className="col-md-7">
+            <div><VideoPlayer video={this.state.selected}/></div>
+          </div>
+          <div className="col-md-5">
+            <div><VideoList click={this.click} videos={exampleVideoData}/> </div>
+          </div>
         </div>
       </div>
-    </div>
-    )
+    );
   }
 }
 
