@@ -2,14 +2,48 @@ import exampleVideoData from '../data/exampleVideoData.js';
 import VideoList from './VideoList.js';
 import VideoPlayer from './VideoPlayer.js';
 import VideoListEntry from './VideoListEntry.js';
+import searchYouTube from '../lib/searchYouTube.js';
+import YOUTUBE_API_KEY from '../config/youtube.js';
+import Search from './Search.js';
+
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: exampleVideoData[0]
+      selected: exampleVideoData[0],
+      videos: exampleVideoData,
+      search: ''
     };
     this.click = this.click.bind(this);
+    this.setVideos = this.setVideos.bind(this);
+    this.submit = this.submit.bind(this);
+    this.setSearch = this.setSearch.bind(this);
+    this.debouncedSearch = _.debounce(() => this.props.searchYouTube({query: this.state.search, max:5, key: YOUTUBE_API_KEY}, this.setVideos), 800, { 'leading': true })
   }
+
+  setSearch(e) {
+    const value = e.target.value;
+    this.setState({
+      search: value
+    })
+    this.debouncedSearch();
+  }
+
+  componentDidMount() {
+    this.props.searchYouTube({query: this.state.search, max:5, key: YOUTUBE_API_KEY}, this.setVideos);
+  }
+
+  setVideos(data) {
+    this.setState({
+      videos: data,
+      selected: data[0]
+    })
+  }
+
+  submit(value) {
+    this.props.searchYouTube({query: value, max: 5, key: YOUTUBE_API_KEY}, this.setVideos)
+  }
+
   click(video) {
     this.setState({
       selected: video
@@ -20,7 +54,7 @@ class App extends React.Component {
       <div>
         <nav className="navbar">
           <div className="col-md-6 offset-md-3">
-            <div>search</div>
+            <div><Search  search={this.setSearch} submit={this.submit}/></div>
           </div>
         </nav>
         <div className="row">
@@ -28,7 +62,7 @@ class App extends React.Component {
             <div><VideoPlayer video={this.state.selected}/></div>
           </div>
           <div className="col-md-5">
-            <div><VideoList click={this.click} videos={exampleVideoData}/> </div>
+            <div><VideoList click={this.click} videos={this.state.videos}/> </div>
           </div>
         </div>
       </div>
@@ -40,7 +74,6 @@ class App extends React.Component {
 // `var` declarations will only exist globally where explicitly defined
 export default App;
 
-ReactDOM.render(<App />, document.getElementById('app'));
 // var App = () => (
 //   <div>
 //     <nav className="navbar">
